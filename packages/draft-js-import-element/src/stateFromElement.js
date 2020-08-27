@@ -506,8 +506,12 @@ function concatFragments(fragments: Array<TextFragment>): TextFragment {
   let characterMeta: CharacterMetaSeq = Seq();
   fragments.forEach((textFragment: TextFragment) => {
     text = text + textFragment.text;
-    characterMeta = characterMeta.concat(textFragment.characterMeta);
+
+    if (!characterMeta.isSuperset(textFragment.characterMeta)) {
+      characterMeta = characterMeta.concat(textFragment.characterMeta);
+    }
   });
+
   return {text, characterMeta};
 }
 

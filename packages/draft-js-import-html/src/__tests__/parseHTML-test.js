@@ -1,5 +1,7 @@
 // @flow
 const {describe, it} = global;
+import * as fs from 'fs';
+import * as path from 'path';
 import expect from 'expect';
 import parseHTML from '../parseHTML';
 
@@ -38,6 +40,30 @@ describe('parseHTML', () => {
           element.firstChild.firstChild &&
           element.firstChild.firstChild.nodeName,
       ).toBe('STRONG');
+    });
+  });
+
+  describe('Large HTML structure with multiple paragraphs', () => {
+    it('should be parsed', () => {
+      let file = path.resolve(__dirname, 'fixtures/large-multiple-paragraphs.html');
+      let html = fs.readFileSync(file);
+      let element = parseHTML(html.toString());
+
+      it('should return an element of some kind', () => {
+        expect(element.nodeType).toBe(1);
+      });
+    });
+  });
+
+  describe('Large HTML structure with single paragraph', () => {
+    it('should be parsed', () => {
+      let file = path.resolve(__dirname, 'fixtures/large-single-paragraph.html');
+      let html = fs.readFileSync(file);
+      let element = parseHTML(html.toString());
+
+      it('should return an element of some kind', () => {
+        expect(element.nodeType).toBe(1);
+      });
     });
   });
 });
