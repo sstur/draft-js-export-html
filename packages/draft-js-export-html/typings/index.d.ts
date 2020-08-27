@@ -5,6 +5,7 @@ declare module 'draft-js-export-html' {
 
     type BlockStyleFn = (block: draftjs.ContentBlock) => RenderConfig|undefined;
     type EntityStyleFn = (entity: draftjs.EntityInstance) => RenderConfig|undefined;
+    type EntityRenderFn = (entity: draftjs.EntityInstance, text: string) => string|undefined;
     type BlockRenderer = (block: draftjs.ContentBlock) => string;
     type RenderConfig = {
         element?: string;
@@ -18,6 +19,7 @@ declare module 'draft-js-export-html' {
         blockRenderers?: { [blockType: string]: BlockRenderer };
         blockStyleFn?: BlockStyleFn;
         entityStyleFn?: EntityStyleFn;
+        entityRenderFn?: EntityRenderFn;
     }
 
     export function stateToHTML(content: draftjs.ContentState, options?: Options): string;

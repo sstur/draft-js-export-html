@@ -165,6 +165,11 @@ let options = {
 let html = stateToHTML(contentState, options);
 ```
 
+### `entityRenderFn`
+
+It is passed an [`entity`](https://draftjs.org/docs/api-reference-entity.html) object
+and should return a string representing the entity in the html output.
+
 ## Contributing
 
 If you want to help out, please open an issue to discuss or join us on [Slack](https://draftjs.herokuapp.com/).

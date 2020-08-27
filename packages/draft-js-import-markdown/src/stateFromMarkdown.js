@@ -12,6 +12,7 @@ type Options = {
   customBlockFn?: CustomBlockFn;
   customInlineFn?: CustomInlineFn;
   parserOptions?: {[key: string]: mixed}; // TODO: Be more explicit
+  inlineElements?: string[];
 };
 
 let defaultOptions: Options = {};

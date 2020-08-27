@@ -65,6 +65,13 @@ stateFromElement(element, {
 });
 ```
 
+- `inlineElements`: Array of (lowercase) tag names which should be handled as inline tags. Example:
+```js
+stateFromElement(element, {
+  inlineElements: ['my-first-custom-tag', 'my-second-custom-tag']
+});
+```
+
 ## License
 
 This software is [BSD Licensed](/LICENSE).

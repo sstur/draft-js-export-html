@@ -37,7 +37,9 @@ type StyleMap = {[styleName: string]: RenderConfig};
 
 type BlockStyleFn = (block: ContentBlock) => ?RenderConfig;
 type EntityStyleFn = (entity: Entity) => ?RenderConfig;
+type EntityRenderFn = (entity: Entity, text: string) => ?string;
 type InlineStyleFn = (style: DraftInlineStyle) => ?RenderConfig;
+
 
 type Options = {
   inlineStyles?: StyleMap;
@@ -45,6 +47,7 @@ type Options = {
   blockRenderers?: BlockRendererMap;
   blockStyleFn?: BlockStyleFn;
   entityStyleFn?: EntityStyleFn;
+  entityRenderFn?: EntityRenderFn;
   defaultBlockTag?: ?string;
 };
 
@@ -372,7 +375,9 @@ class MarkupGenerator {
       .map(([entityKey, stylePieces]) => {
         let content = stylePieces
           .map(([text, styleSet]) => {
-            let content = encodeContent(text);
+            let content = (entityKey &&
+              this.options.entityRenderFn && this.options.entityRenderFn(this.contentState.getEntity(entityKey), text))
+              || encodeContent(text);
             for (let styleName of this.styleOrder) {
               // If our block type is CODE then don't wrap inline code elements.
               if (styleName === CODE && blockType === BLOCK_TYPE.CODE) {

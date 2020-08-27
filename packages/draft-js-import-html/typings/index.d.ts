@@ -26,6 +26,7 @@ declare module 'draft-js-import-html' {
         elementStyles?: { [styleName: string]: string };
         customBlockFn?: CustomBlockFn;
         customInlineFn?: CustomInlineFn;
+        inlineElements?: string []
     }
 
     export function stateFromHTML(html: string, options?: Options): draftjs.ContentState;

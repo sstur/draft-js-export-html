@@ -12,6 +12,7 @@ type Options = {
   blockTypes?: {[key: string]: string};
   customBlockFn?: CustomBlockFn;
   customInlineFn?: CustomInlineFn;
+  inlineElements?: string[];
 };
 
 const defaultOptions: Options = {};

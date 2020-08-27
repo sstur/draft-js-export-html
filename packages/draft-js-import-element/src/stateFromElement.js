@@ -83,6 +83,7 @@ type Options = {
   blockTypes?: {[key: string]: string};
   customBlockFn?: CustomBlockFn;
   customInlineFn?: CustomInlineFn;
+  inlineElements?: string[];
 };
 type DataMap<T> = {[key: string]: T};
 
@@ -403,10 +404,12 @@ class ContentGenerator {
 
   processNode(node: DOMNode) {
     if (node.nodeType === NODE_TYPE_ELEMENT) {
+      let {inlineElements} = this.options;
       // $FlowIssue
       let element: DOMElement = node;
       let tagName = element.nodeName.toLowerCase();
-      if (INLINE_ELEMENTS.hasOwnProperty(tagName)) {
+      if (INLINE_ELEMENTS.hasOwnProperty(tagName)
+        || (inlineElements && inlineElements.find((el) => el === tagName))) {
         this.processInlineElement(element);
       } else {
         this.processBlockElement(element);
