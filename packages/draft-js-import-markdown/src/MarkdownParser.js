@@ -769,7 +769,7 @@ Parser.prototype.tok = function() {
       );
     }
     case 'code': {
-      return this.renderer.code(this.token.text, this.token.lang);
+      return this.renderer.code(this.inline.parse(this.token.text), this.token.lang);
     }
     case 'blockquote_start': {
       let body = new FragmentNode();
