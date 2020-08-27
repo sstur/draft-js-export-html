@@ -279,4 +279,32 @@ describe('stateToHTML', () => {
       'a',
     );
   });
+
+  it('should support custom block tags map', () => {
+    let contentState = convertFromRaw(
+      {
+        entityMap: {},
+        blocks: [{
+          key: '33nh8',
+          text: 'text',
+          type: 'unstyled',
+          depth: 0,
+          inlineStyleRange: [],
+          entityRanges: [],
+        }],
+      },
+    );
+
+    expect(stateToHTML(contentState)).toBe(
+      '<p>text</p>',
+    );
+
+    expect(stateToHTML(contentState, {
+      blockTagsMap: {
+        unstyled: 'h1',
+      },
+    })).toBe(
+      '<h1>text</h1>',
+    );
+  });
 });

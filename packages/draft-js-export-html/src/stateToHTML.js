@@ -30,6 +30,9 @@ type RenderConfig = {
   style?: StyleDescr;
 };
 
+type HTMLTag = 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'figure' | 'blockquote' | 'pre' | 'code' | 'li' | 'div';
+
+type BlockTagsMap = {[blockType: string]: HTMLTag};
 type BlockRenderer = (block: ContentBlock) => ?string;
 type BlockRendererMap = {[blockType: string]: BlockRenderer};
 
@@ -42,6 +45,7 @@ type InlineStyleFn = (style: DraftInlineStyle) => ?RenderConfig;
 type Options = {
   inlineStyles?: StyleMap;
   inlineStyleFn?: InlineStyleFn;
+  blockTagsMap?: BlockTagsMap;
   blockRenderers?: BlockRendererMap;
   blockStyleFn?: BlockStyleFn;
   entityStyleFn?: EntityStyleFn;
@@ -125,7 +129,11 @@ const DATA_TO_ATTR = {
 
 // The reason this returns an array is because a single block might get wrapped
 // in two tags.
-function getTags(blockType: string, defaultBlockTag): Array<string> {
+function getTags(blockType: string, defaultBlockTag, blockTagsMap?: BlockTagsMap): Array<string> {
+  let customTag = blockTagsMap ? blockTagsMap[blockType] : null;
+  if (customTag) {
+    return [customTag];
+  }
   switch (blockType) {
     case BLOCK_TYPE.HEADER_ONE:
       return ['h1'];
@@ -281,7 +289,7 @@ class MarkupGenerator {
   }
 
   writeStartTag(block, defaultBlockTag) {
-    let tags = getTags(block.getType(), defaultBlockTag);
+    let tags = getTags(block.getType(), defaultBlockTag, this.options.blockTagsMap);
 
     let attrString;
     if (this.options.blockStyleFn) {
@@ -306,7 +314,7 @@ class MarkupGenerator {
   }
 
   writeEndTag(block, defaultBlockTag) {
-    let tags = getTags(block.getType(), defaultBlockTag);
+    let tags = getTags(block.getType(), defaultBlockTag, this.options.blockTagsMap);
     if (tags.length === 1) {
       this.output.push(`</${tags[0]}>\n`);
     } else {
