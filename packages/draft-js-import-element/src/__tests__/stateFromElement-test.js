@@ -146,6 +146,41 @@ describe('stateFromElement', () => {
     });
   });
 
+  it('should return multiple style from customInlineFn', () => {
+    let element = new ElementNode('div', [], [
+      new ElementNode(
+        'span',
+        [{style: 'font-family', value: 'sans-serif'},{style: 'font-size', value: '12px'},],
+        [new TextNode('Hello')]
+      )
+    ]);
+    let options = {
+      customInlineFn(el, {Style}) {
+        if (el.tagName === 'SPAN') {
+          return Style(['CUSTOM_STYLE_1', 'CUSTOM_STYLE_2']);
+        }
+      },
+    };
+    let contentState = stateFromElement(element, options);
+    let rawContentState = removeBlockKeys(convertToRaw(contentState));
+    expect(rawContentState).toEqual({
+      entityMap: {},
+      blocks: [
+        {
+          text: 'Hello',
+          type: 'unstyled',
+          depth: 0,
+          inlineStyleRanges: [
+            {offset: 0, length: 5, style: 'CUSTOM_STYLE_1'},
+            {offset: 0, length: 5, style: 'CUSTOM_STYLE_2'}
+          ],
+          entityRanges: [],
+          data: {},
+        },
+      ],
+    });
+  });
+
   it('should support option elementStyles', () => {
     let textNode = new TextNode('Superscript');
     let element = new ElementNode('sup', [], [textNode]);

@@ -347,7 +347,7 @@ class ContentGenerator {
     if (customInline != null) {
       switch (customInline.type) {
         case 'STYLE': {
-          style = style.add(customInline.style);
+          [].concat(customInline.style).forEach(customStyle => style = style.add(customStyle));
           break;
         }
         case 'ENTITY': {
