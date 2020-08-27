@@ -206,6 +206,39 @@ describe('stateToHTML', () => {
     );
   });
 
+  it('blockStyleFn should support setting custom element', () => {
+    let options = {
+      blockStyleFn: () => ({
+        element: 'li',
+      }),
+    };
+
+    let contentState1 = convertFromRaw(
+      // <h1>Hello <em>world</em>.</h1>
+      {
+        entityMap: {},
+        blocks: [
+          {
+            key: 'dn025',
+            text: 'Hello world.',
+            type: 'unstyled',
+            depth: 0,
+            inlineStyleRanges: [{offset: 6, length: 5, style: 'ITALIC'}],
+            entityRanges: [],
+          },
+        ],
+      }, // eslint-disable-line
+    );
+
+    expect(stateToHTML(contentState1)).toBe(
+      '<p>Hello <em>world</em>.</p>',
+    );
+
+    expect(stateToHTML(contentState1, options)).toBe(
+      '<li>Hello <em>world</em>.</li>',
+    );
+  });
+
   it('should support custom entity styles', () => {
     let options = {
       entityStyleFn: (entity) => {

@@ -285,7 +285,7 @@ class MarkupGenerator {
 
     let attrString;
     if (this.options.blockStyleFn) {
-      let {attributes, style} = this.options.blockStyleFn(block) || {};
+      let {attributes, style, element} = this.options.blockStyleFn(block) || {};
       // Normalize `className` -> `class`, etc.
       attributes = normalizeAttributes(attributes);
       if (style != null) {
@@ -294,6 +294,9 @@ class MarkupGenerator {
           attributes == null
             ? {style: styleAttr}
             : {...attributes, style: styleAttr};
+      }
+      if (element != null) {
+        tags = [element];
       }
       attrString = stringifyAttrs(attributes);
     } else {
@@ -307,6 +310,14 @@ class MarkupGenerator {
 
   writeEndTag(block, defaultBlockTag) {
     let tags = getTags(block.getType(), defaultBlockTag);
+
+    if (this.options.blockStyleFn) {
+      let {element} = this.options.blockStyleFn(block) || {};
+      if (element != null) {
+        tags = [element];
+      }
+    }
+
     if (tags.length === 1) {
       this.output.push(`</${tags[0]}>\n`);
     } else {
