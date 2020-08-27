@@ -347,7 +347,7 @@ class ContentGenerator {
     if (customInline != null) {
       switch (customInline.type) {
         case 'STYLE': {
-          style = style.add(customInline.style);
+          style = style.union(customInline.style.split(' '));
           break;
         }
         case 'ENTITY': {
@@ -391,8 +391,11 @@ class ContentGenerator {
     let style = block.styleStack.slice(-1)[0];
     let entity = block.entityStack.slice(-1)[0];
     let charMetadata = CharacterMetadata.create({
-      style: style,
       entity: entity,
+    });
+    style.forEach((s) => {
+      charMetadata = CharacterMetadata.applyStyle(charMetadata, s);
+      return true;
     });
     let seq: CharacterMetaSeq = Repeat(charMetadata, text.length);
     block.textFragments.push({
