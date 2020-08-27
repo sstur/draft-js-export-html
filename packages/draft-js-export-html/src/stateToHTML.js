@@ -18,7 +18,6 @@ import type {
   EntityInstance,
 } from 'draft-js';
 import type {CharacterMetaList} from 'draft-js-utils';
-import type {DraftInlineStyle} from 'draft-js/lib/DraftInlineStyle';
 
 type AttrMap = {[key: string]: string};
 type Attributes = {[key: string]: string};
@@ -37,7 +36,7 @@ type StyleMap = {[styleName: string]: RenderConfig};
 
 type BlockStyleFn = (block: ContentBlock) => ?RenderConfig;
 type EntityStyleFn = (entity: Entity) => ?RenderConfig;
-type InlineStyleFn = (style: DraftInlineStyle) => ?RenderConfig;
+type InlineStyleFn = (style: string) => ?RenderConfig;
 
 type Options = {
   inlineStyles?: StyleMap;
@@ -344,18 +343,23 @@ class MarkupGenerator {
       return content;
     }
 
-    const renderConfig = this.inlineStyleFn(styleSet);
-    if (!renderConfig) {
-      return content;
-    }
+    const inlineStyleFn = this.inlineStyleFn;
 
-    const {element = 'span', attributes, style} = renderConfig;
-    const attrString = stringifyAttrs({
-      ...attributes,
-      style: style && styleToCSS(style),
-    });
+    return styleSet.reduce((nextContent, styleItem) => {
+      const renderConfig = inlineStyleFn(styleItem);
 
-    return `<${element}${attrString}>${content}</${element}>`;
+      if (!renderConfig) {
+        return nextContent;
+      }
+
+      const {element = 'span', attributes, style} = renderConfig;
+      const attrString = stringifyAttrs({
+        ...attributes,
+        style: style && styleToCSS(style),
+      });
+
+      return `<${element}${attrString}>${nextContent}</${element}>`;
+    }, content);
   }
 
   renderBlockContent(block: ContentBlock): string {

@@ -112,15 +112,14 @@ describe('stateToHTML', () => {
 
   it('should support inline style function', () => {
     let options = {
-      inlineStyleFn: (styles) => {
+      inlineStyleFn: (style) => {
         let key = 'color-';
-        let color = styles.filter((value) => value.startsWith(key)).first();
 
-        if (color) {
+        if (style.startsWith(key)) {
           return {
             element: 'span',
             style: {
-              color: color.replace(key, ''),
+              color: style.replace(key, ''),
             },
           };
         }
