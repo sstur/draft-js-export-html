@@ -38,6 +38,7 @@ type StyleMap = {[styleName: string]: RenderConfig};
 type BlockStyleFn = (block: ContentBlock) => ?RenderConfig;
 type EntityStyleFn = (entity: Entity) => ?RenderConfig;
 type InlineStyleFn = (style: DraftInlineStyle) => ?RenderConfig;
+type RenderBlockContentFn = (block: ContentBlock) => string;
 
 type Options = {
   inlineStyles?: StyleMap;
@@ -46,6 +47,7 @@ type Options = {
   blockStyleFn?: BlockStyleFn;
   entityStyleFn?: EntityStyleFn;
   defaultBlockTag?: ?string;
+  renderBlockContentFn?: RenderBlockContentFn;
 };
 
 const {BOLD, CODE, ITALIC, STRIKETHROUGH, UNDERLINE} = INLINE_STYLE;
@@ -215,7 +217,7 @@ class MarkupGenerator {
   }
 
   processBlock() {
-    let {blockRenderers, defaultBlockTag} = this.options;
+    let {blockRenderers, defaultBlockTag, renderBlockContentFn} = this.options;
     let block = this.blocks[this.currentBlock];
     let blockType = block.getType();
     let newWrapperTag = getWrapperTag(blockType);
@@ -242,7 +244,12 @@ class MarkupGenerator {
       return;
     }
     this.writeStartTag(block, defaultBlockTag);
-    this.output.push(this.renderBlockContent(block));
+    let customRenderBlockContentOutput = renderBlockContentFn ? renderBlockContentFn(block) : null;
+    if (customRenderBlockContentOutput != null) {
+      this.output.push(customRenderBlockContentOutput);
+    } else {
+      this.output.push(this.renderBlockContent(block));
+    }
     // Look ahead and see if we will nest list.
     let nextBlock = this.getNextBlock();
     if (
