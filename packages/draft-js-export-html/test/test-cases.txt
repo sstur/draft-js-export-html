@@ -27,8 +27,8 @@
 <p><a href="/" title="hi" data-id="42" data-mutability="mutable"><em>a</em></a></p>
 
 # Entity with inline style
-{"entityMap":{"0":{"type":"LINK","mutability":"MUTABLE","data":{"url":"/"}}},"blocks":[{"key":"8r91j","text":"a","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"ITALIC"}],"entityRanges":[{"offset":0,"length":1,"key":0}]}]}
-<p><a href="/"><em>a</em></a></p>
+{"entityMap":{"0":{"type":"LINK","mutability":"MUTABLE","data":{"url":"http://example.com/test?x=1&y=2"}}},"blocks":[{"key":"8r91j","text":"a","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":1,"style":"ITALIC"}],"entityRanges":[{"offset":0,"length":1,"key":0}]}]}
+<p><a href="http://example.com/test?x=1&y=2"><em>a</em></a></p>
 
 # Ordered list
 {"entityMap":{},"blocks":[{"key":"33nh8","text":"An ordered list:","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[]},{"key":"8kinl","text":"One","type":"ordered-list-item","depth":0,"inlineStyleRanges":[],"entityRanges":[]},{"key":"ekll4","text":"Two","type":"ordered-list-item","depth":0,"inlineStyleRanges":[],"entityRanges":[]}]}

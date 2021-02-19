@@ -469,7 +469,10 @@ function stringifyAttrs(attrs: ?Attributes) {
   for (let name of Object.keys(attrs)) {
     let value = attrs[name];
     if (value != null) {
-      parts.push(` ${name}="${encodeAttr(value + '')}"`);
+      if (name !== 'href' && name !== 'src') {
+        value = encodeAttr(value + '');
+      }
+      parts.push(` ${name}="${value}"`);
     }
   }
   return parts.join('');
