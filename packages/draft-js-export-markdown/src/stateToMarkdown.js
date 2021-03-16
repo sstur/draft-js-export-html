@@ -7,10 +7,13 @@ import {
   INLINE_STYLE,
 } from 'draft-js-utils';
 
-import type {ContentState, ContentBlock} from 'draft-js';
+import type {ContentState, ContentBlock, EntityInstance} from 'draft-js';
+
+type RenderEntityFn = (content: string, entity: EntityInstance) => string;
 
 type Options = {
   gfm?: ?boolean;
+  renderEntity?: RenderEntityFn;
 };
 
 const {BOLD, CODE, ITALIC, STRIKETHROUGH, UNDERLINE} = INLINE_STYLE;
@@ -198,13 +201,16 @@ class MarkupGenerator {
     let {contentState} = this;
     let blockType = block.getType();
     let text = block.getText();
+
     if (text === '') {
       // Prevent element collapse if completely empty.
       // TODO: Replace with constant.
       return '\u200B';
     }
+
     let charMetaList = block.getCharacterList();
     let entityPieces = getEntityRanges(text, charMetaList);
+
     return entityPieces
       .map(([entityKey, stylePieces]) => {
         let content = stylePieces
@@ -224,10 +230,10 @@ class MarkupGenerator {
             const leftPad = contentLength - content.length;
             content = content.trimRight();
             const rightPad = contentLength - content.length - leftPad;
-if (!content.length) {
-  // Return the original text if there is nothing left after trimming.
-  return text;
-}
+            if (!content.length) {
+              // Return the original text if there is nothing left after trimming.
+              return text;
+            }
 
             // NOTE: We attempt some basic character escaping here, although
             // I don't know if escape sequences are really valid in markdown,
@@ -254,24 +260,49 @@ if (!content.length) {
             return content.padEnd(content.length + rightPad);
           })
           .join('');
+
         let entity = entityKey ? contentState.getEntity(entityKey) : null;
-        if (entity != null && entity.getType() === ENTITY_TYPE.LINK) {
-          let data = entity.getData();
-          let url = data.href || data.url || '';
-          let title = data.title ? ` "${escapeTitle(data.title)}"` : '';
-          return `[${content}](${encodeURL(url)}${title})`;
-        } else if (entity != null && entity.getType() === ENTITY_TYPE.IMAGE) {
-          let data = entity.getData();
-          let src = data.src || '';
-          let alt = data.alt ? `${escapeTitle(data.alt)}` : '';
-          return `![${alt}](${encodeURL(src)})`;
-        } else if (entity != null && entity.getType() === ENTITY_TYPE.EMBED) {
-          return entity.getData().url || content;
-        } else {
+
+        if (entity === null) {
           return content;
         }
+
+        return this.renderContentEntity(content, entity);
       })
       .join('');
+  }
+
+  renderContentEntity(content: string, entity: EntityInstance): string {
+    let {renderEntity} = this.options;
+
+    // Custom entity renderer must be a function & return string
+    // Otherwise, default to built-in renderer below
+    if (typeof renderEntity === 'function') {
+      const rendered = renderEntity(content, entity);
+
+      if (typeof rendered === 'string') {
+        return rendered;
+      }
+    }
+
+    const data = entity.getData();
+    switch (entity.getType()) {
+      case ENTITY_TYPE.LINK:
+        let url = data.href || data.url || '';
+        let title = data.title ? ` "${escapeTitle(data.title)}"` : '';
+        return `[${content}](${encodeURL(url)}${title})`;
+
+      case ENTITY_TYPE.IMAGE:
+        let src = data.src || '';
+        let alt = data.alt ? `${escapeTitle(data.alt)}` : '';
+        return `![${alt}](${encodeURL(src)})`;
+
+      case ENTITY_TYPE.EMBED:
+        return data.url || content;
+
+      default:
+        return content;
+    }
   }
 }
 
